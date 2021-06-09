@@ -92,6 +92,26 @@
  `(let ((it ,test))
      (if it ,then ,else)))
 
+;;;; Function Utilities from Paul Graham's On Lisp
+
+(defun mappend (fn &rest lsts)
+    (apply #'append (apply #'mapcar fn lsts)))
+
+(defun rmapcar (fn &rest args)
+    (if (some #'atom args)
+        (apply fn args)
+        (apply #'mapcar
+               #'(lambda (&rest args)
+                    (apply #'rmapcar fn args))
+               args)))
+
+(defun compose (&rest fns)
+    (if fns
+        (let ((fn1 (car (last fns)))
+              (fns (butlast fns)))
+            #'(lambda (&rest args)
+                (reduce #'funcall fns :from-end t :initial-value (apply fn1 args))))
+        #'identity))
 
 ;;;; My Original 
 
@@ -115,23 +135,4 @@
                     acc
                     (fact (- n 1) (* acc n)))))
             (fact x 1)))
-
-(defun mappend (fn &rest lsts)
-    (apply #'append (apply #'mapcar fn lsts)))
-
-(defun rmapcar (fn &rest args)
-    (if (some #'atom args)
-        (apply fn args)
-        (apply #'mapcar
-               #'(lambda (&rest args)
-                    (apply #'rmapcar fn args))
-               args)))
-
-(defun compose (&rest fns)
-    (if fns
-        (let ((fn1 (car (last fns)))
-              (fns (butlast fns)))
-            #'(lambda (&rest args)
-                (reduce #'funcall fns :from-end t :initial-value (apply fn1 args))))
-        #'identity))
 
