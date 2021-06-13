@@ -1,5 +1,48 @@
 ;;;; Conteners
 
+;;;;
+
+(defstruct rbuf
+  maxSize
+  (rindex 0)
+  (windex 0)
+  buffer
+  )
+
+(defun new-rbuf (size)
+  (make-rbuf :buffer (make-array size :initial-element nil) :maxSize size))
+
+(defmacro rbuf-index-update (buf index)
+  `(let ((result (,index ,buf)))
+     (incf (,index ,buf))
+     (if (eql (,index ,buf) (rbuf-maxSize ,buf))
+         (setf (,index ,buf) 0))
+     result))
+
+(defun rbuf-rindex-update (buf)
+  (rbuf-index-update buf rbuf-rindex))
+
+(defun rbuf-windex-update (buf)
+  (rbuf-index-update buf rbuf-windex))
+
+(defun rbuf-empty? (buf)
+  (eql (rbuf-rindex buf) (rbuf-windex buf)))
+
+(defun rbuf-ref (buf n)
+  (svref (rbuf-buffer buf) n))
+
+(defun (setf rbuf-ref) (val buf n)
+  (setf (svref (rbuf-buffer buf) n) val))
+
+(defun rbuf-get (buf)
+  (if (rbuf-empty? buf)
+      nil
+      (rbuf-ref buf (rbuf-rindex-update buf))))
+
+(defun rbuf-put (buf val)
+  (setf (rbuf-ref buf (rbuf-windex-update buf)) val))
+
+
 ;;;; Double Linked List
 
 ;;; Double Linked List Node
