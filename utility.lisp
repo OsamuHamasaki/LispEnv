@@ -136,3 +136,28 @@
                     (fact (- n 1) (* acc n)))))
             (fact x 1)))
 
+(defun runlen (x)
+  (labels ((rln (x n lst acc)
+             (if (null lst)
+                 (nreverse (push (cons x n) acc))
+                 (if (eql x (car lst))
+                     (rln x (1+ n) (cdr lst) acc)
+                     (rln (car lst) 1 (cdr lst) (push (cons x n) acc))))))
+    (if (null x)
+        x
+        (rln (car x) 1 (cdr x) nil))))
+
+(defun drun (pare)
+  (labels ((drn (x n acc)
+             (if (zerop n)
+                 (nreverse acc)
+                 (drn x (1- n) (push x acc)))))
+    (drn (car pare) (cdr pare) nil)))
+
+(defun derunlen (lst)
+  (labels ((dernln (lst acc)
+             (if (null lst)
+                 acc
+                 (dernln (cdr lst) (nconc acc (drun (car lst)))))))
+    (dernln lst nil)))
+
