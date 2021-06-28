@@ -147,17 +147,14 @@
         x
         (rln (car x) 1 (cdr x) nil))))
 
-(defun drun (pare)
+(defun derunlen (lst)
   (labels ((drn (x n acc)
              (if (zerop n)
-                 (nreverse acc)
-                 (drn x (1- n) (push x acc)))))
-    (drn (car pare) (cdr pare) nil)))
-
-(defun derunlen (lst)
-  (labels ((dernln (lst acc)
-             (if (null lst)
                  acc
-                 (dernln (cdr lst) (nconc acc (drun (car lst)))))))
+                 (drn x (1- n) (push x acc))))
+           (dernln (lst acc)
+             (if (null lst)
+                 (nreverse acc)
+                 (dernln (cdr lst) (drn (caar lst) (cdar lst) acc )))))
     (dernln lst nil)))
 
