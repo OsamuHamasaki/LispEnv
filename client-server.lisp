@@ -1,11 +1,12 @@
 (require 'sb-bsd-sockets)
-(defparameter *localhost-address* '(127 0 0 1))
-(defparameter *port* 8080)
+(defconstant local-host-address '(127 0 0 1))
+(defconstant any-host-address '(0 0 0 0))
+(defconstant default-port 8080)
 
-(defun make-server (address port)
+(defun make-server (port)
   (let ((server (make-instance 'sb-bsd-sockets:inet-socket :type :stream :protocol :tcp)))
     (setf (sb-bsd-sockets:sockopt-reuse-address server) t)
-    (sb-bsd-sockets:socket-bind server address port)
+    (sb-bsd-sockets:socket-bind server any-host-address port)
     (sb-bsd-sockets:socket-listen server 1)
     server))
 
@@ -21,8 +22,8 @@
   (recieve-request server fn)
   (server-loop server fn))
 
-(defun server-start (fn &optional (address *localhost-address*) (port *port*))
-  (let ((server (make-server address port)))
+(defun server-start (fn &optional (port default-port))
+  (let ((server (make-server port)))
     (unwind-protect
       (server-loop server fn)
       (progn
@@ -40,7 +41,7 @@
     (finish-output stream)
     (funcall resfn stream)))
 
-(defun client-run (reqfn resfn &optional (address *localhost-address*) (port *port*))
+(defun client-run (reqfn resfn &optional (address local-host-address) (port default-port))
   (let ((client (make-client address port)))
     (unwind-protect
       (send-request client reqfn resfn)
