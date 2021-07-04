@@ -47,3 +47,19 @@
       (send-request client reqfn resfn)
       (sb-bsd-sockets:socket-close client))))
 
+
+;;; Example
+(defun server-example ()
+  (server-start
+    #'(lambda (stream)
+        (let ((sexp (read stream)))
+          (format t "client Message: ~A~%" sexp)
+          (format stream "~A~%" (cdr sexp))))))
+
+(defun client-example ()
+  (client-run
+    #'(lambda (stream)
+        (format stream "~A~%" '(1 2 3)))
+    #'(lambda (stream)
+        (format t "Server message: ~A~%" (read stream)))))
+
