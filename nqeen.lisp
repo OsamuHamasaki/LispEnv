@@ -55,7 +55,7 @@
                      #'next-south #'next-south-west #'next-west #'next-north-west)))
     (cons place (apply #'append (mapcar #'(lambda (fn) (teritory-x place fn)) funcs)))))
 
-(defun solve-nqeen (candidates result index len)
+(defun solve-nqueen (candidates result index len)
   (cond 
     ((= (length result) *bord-size*) (values result t))
     ((>= index len) (values result nil))
@@ -63,13 +63,13 @@
       (let* ((place (nth index candidates))
              (remains (set-difference candidates (teritory place) :test #'equal)))
         (multiple-value-bind (ret successed)
-          (solve-nqeen remains (cons place result) 0 (length remains))
+          (solve-nqueen remains (cons place result) 0 (length remains))
           (if successed
               (values ret t)
-              (solve-nqeen candidates result (1+ index) len)))))))
+              (solve-nqueen candidates result (1+ index) len)))))))
 
-(defun nqeen (n)
+(defun nqueen (n)
   (setf *bord-size* n)
   (let ((candidates (initial-candidates)))
-    (solve-nqeen candidates nil 0 (length candidates))))
+    (solve-nqueen candidates nil 0 (length candidates))))
 
