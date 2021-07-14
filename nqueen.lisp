@@ -12,47 +12,22 @@
 
 (defun out-of-bound (place)
   (let ((line (car place))
-        (row (cdr place))
-        (n *bord-size*))
-    (or (> 0 line) (> 0 row) (>= line n) (>= row n))))
+        (row (cdr place)))
+    (or (> 0 line) (> 0 row) (>= line *bord-size*) (>= row *bord-size*))))
 
-(defun teritory-x (place next-fn)
+(defun next-cell (place fn-pair)
+  (cons (funcall (car fn-pair) (car place)) (funcall (cdr fn-pair) (cdr place))))
+
+(defun teritory-x (place fn-pair)
   (labels ((teritory-x1 (place acc)
              (if (out-of-bound place)
                  acc
-                 (teritory-x1 (funcall next-fn place) (push place acc)))))
-        (teritory-x1 (funcall next-fn place) nil)))
-
-(defun next-x (place fn-car fn-cdr)
-  (cons (funcall fn-car (car place)) (funcall fn-cdr (cdr place))))
-
-(defun next-north (place)
-  (next-x place #'1- #'identity))
-
-(defun next-south (place)
-  (next-x place #'1+ #'identity))
-
-(defun next-east (place)
-  (next-x place #'identity #'1+))
-
-(defun next-west (place)
-  (next-x place #'identity #'1-))
-
-(defun next-north-west (place)
-  (next-x place #'1- #'1-))
-
-(defun next-south-west (place)
-  (next-x place #'1+ #'1-))
-
-(defun next-north-east (place)
-  (next-x place #'1- #'1+))
-
-(defun next-south-east (place)
-  (next-x place #'1+ #'1+))
+                 (teritory-x1 (next-cell place fn-pair) (cons place acc)))))
+        (teritory-x1 (next-cell place fn-pair) nil)))
 
 (defun teritory (place)
-  (let ((funcs (list #'next-north #'next-north-east #'next-east #'next-south-east
-                     #'next-south #'next-south-west #'next-west #'next-north-west)))
+  (let ((funcs (list (cons #'1- #'identity) (cons #'1- #'1+) (cons #'identity #'1+) (cons #'1+ #'1+) 
+                     (cons #'1+ #'identity) (cons #'1+ #'1-) (cons #'identity #'1-) (cons #'1- #'1-))))
     (cons place (apply #'append (mapcar #'(lambda (fn) (teritory-x place fn)) funcs)))))
 
 (defun solve-nqueen (candidates result index len)
