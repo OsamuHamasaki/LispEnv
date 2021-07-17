@@ -1,5 +1,10 @@
 ;;;; N Queen solver
 
+(defpackage nqueen 
+  (:use common-lisp)
+  (:export solve))
+(in-package nqueen)
+
 (defparameter *bord-size* 8)
 
 (defun initial-candidates ()
@@ -43,7 +48,7 @@
               (values ret t)
               (solve-nqueen candidates result (1+ index) len)))))))
 
-(defun nqueen (n)
+(defun solve (n)
   (setf *bord-size* n)
   (let ((candidates (initial-candidates)))
     (solve-nqueen candidates nil 0 (length candidates))))
